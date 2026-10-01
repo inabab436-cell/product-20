@@ -35,6 +35,10 @@ export const Route = createFileRoute("/products")({
     meta: [
       { title: "المخزون · cupai" },
       { name: "description", content: "منتجاتك، الألوان، المقاسات، والكميات." },
+      { property: "og:title", content: "المخزون · cupai" },
+      { property: "og:description", content: "منتجاتك، الألوان، المقاسات، والكميات." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
     ],
   }),
   component: ProductsPage,
@@ -766,12 +770,6 @@ function AddProductDialog({
     });
   }
 
-  function addFiles(key: string, files: FileList | null) {
-    if (!files || files.length === 0) return;
-    const picked = Array.from(files).filter((f) => /^image\//i.test(f.type));
-    if (picked.length === 0) return;
-    setPendingImages((prev) => ({ ...prev, [key]: [...(prev[key] ?? []), ...picked] }));
-  }
   function removeFile(key: string, index: number) {
     setPendingImages((prev) => ({
       ...prev, [key]: (prev[key] ?? []).filter((_, i) => i !== index),
@@ -793,11 +791,6 @@ function AddProductDialog({
     });
   }
 
-  /** Images of a colour are shown once, on the first row of its group. */
-  function isFirstRowOfGroup(i: number) {
-    return colors.findIndex((r) => r.gkey === colors[i]!.gkey) === i;
-  }
-
   /** Remove a row; if it was the last row of its group, its images go back to intake. */
   function removeColor(i: number) {
     const gone = colorsRef.current[i];
@@ -812,18 +805,11 @@ function AddProductDialog({
     });
   }
 
-  /** Move one pending image to another group ("g", a colour group, or a new group). */
+  /** Move one pending image between the general area and a named colour. */
   function moveFile(fromKey: string, index: number, toKey: string) {
     const file = (pendingImages[fromKey] ?? [])[index];
     if (!file) return;
-    let target = toKey;
-    if (toKey === "__new") {
-      target = nextAddGroupKey();
-      setColors((rows) => [
-        ...rows,
-        { gkey: target, label: "", size: nextCycleSize(rows.length), quantity: "" },
-      ]);
-    }
+    const target = toKey;
     if (target === fromKey) return;
     setPendingImages((prev) => ({
       ...prev,
@@ -940,26 +926,35 @@ function AddProductDialog({
                 </button>
               </div>
               <select
-                aria-label="نقل الصورة إلى مجموعة"
-                className="h-6 w-[84px] rounded-md border border-border/60 bg-background px-1 text-[10px]"
-                value={imgKey}
+                aria-label="لون الصورة"
+                className="h-7 w-24 rounded-md border border-border/60 bg-background px-1 text-[10px]"
+                value={colors.some((c) => c.gkey === imgKey && c.label.trim()) ? imgKey : "g"}
                 onChange={(e) => moveFile(imgKey, k, e.target.value)}
               >
-                <option value="g">بدون لون بعد</option>
-                {Array.from(new Map(colors.map((c) => [c.gkey, c] as const)).values()).map(
-                  (c, ci) => (
+                <option value="g">اختر اللون</option>
+                {Array.from(new Map(colors.filter((c) => c.label.trim()).map((c) => [colorKey(c.label), c] as const)).values()).map(
+                  (c) => (
                     <option key={c.gkey} value={c.gkey}>
-                      {c.label.trim() || `لون ${ci + 1}`}
+                      {c.label.trim()}
                     </option>
                   ),
                 )}
-                <option value="__new">+ مجموعة جديدة</option>
               </select>
 
             </div>
 
           );
         })}
+      </div>
+    );
+  }
+
+  function AllPendingImages() {
+    return (
+      <div className="space-y-3">
+        {Object.keys(pendingImages).map((key) => (
+          <Thumbs key={key} imgKey={key} />
+        ))}
       </div>
     );
   }
@@ -1008,9 +1003,9 @@ function AddProductDialog({
               />
             </label>
             <p className="text-[10px] text-muted-foreground">
-              بعد الرفع، اختر لون كل صورة من القائمة أسفلها أو أضف لونًا جديدًا.
+              أضف أسماء الألوان بالأسفل، ثم اختر لون كل صورة من القائمة أسفلها.
             </p>
-            <Thumbs imgKey="g" />
+            <AllPendingImages />
           </section>
 
           {/* Basic info */}
@@ -1098,28 +1093,6 @@ function AddProductDialog({
                     <Trash2 className="h-4 w-4" />
                   </Button>
                 </div>
-
-
-
-                <div className="flex items-center justify-between gap-2">
-                  <span className="text-[10px] text-muted-foreground">صور هذا اللون</span>
-                </div>
-                <label
-                  className="flex cursor-pointer items-center justify-center gap-2 rounded-lg border border-dashed border-border/70 bg-background/60 px-3 py-2.5 text-[11px] text-muted-foreground transition hover:border-primary/50 hover:text-primary"
-                  onDragOver={(e) => e.preventDefault()}
-                  onDrop={(e) => {
-                    e.preventDefault();
-                    addFiles(c.gkey, e.dataTransfer.files);
-                  }}
-                >
-                  <ImagePlus className="h-4 w-4" /> رفع صور هذا اللون أو إفلاتها هنا
-                  <input
-                    type="file" accept="image/*" multiple className="hidden"
-                    onChange={(e) => { addFiles(c.gkey, e.target.files); e.currentTarget.value = ""; }}
-                  />
-                </label>
-                {/* Images of a colour are shown ONCE, on the first row of its group. */}
-                {isFirstRowOfGroup(i) && <Thumbs imgKey={c.gkey} />}
               </div>
             ))}
           </section>
@@ -1298,19 +1271,6 @@ function EditProductDialog({
 
   if (!product) return null;
 
-  /** Images assigned to a colour group. */
-  const imagesForGroup = (colorId: string | undefined, gkey: string) =>
-    product.images.filter(
-      (i) => (colorId ? i.color_id === colorId : false) || savedAssign[i.id] === gkey,
-    );
-
-  /** Images that are not assigned to a colour or size. */
-  const imagesFor = (colorId?: string) =>
-    product.images.filter((i) =>
-      colorId ? i.color_id === colorId : !i.color_id && !i.size_id && !savedAssign[i.id],
-    );
-
-
   /**
    * Smart button: print one more row. If the previous row already carries a
    * colour, the new row keeps that SAME colour (same colour id and same image
@@ -1344,22 +1304,6 @@ function EditProductDialog({
     });
   }
 
-  /** Images of a colour are shown once, on the first row that carries it. */
-  const isFirstRowOfColor = (i: number) => {
-    const row = colors[i]!;
-    const same = row.label.trim()
-      ? (r: EditColor) => colorKey(r.label) === colorKey(row.label)
-      : (r: EditColor) => r.gkey === row.gkey;
-    return colors.findIndex(same) === i;
-  };
-
-  function addFiles(gkey: string, files: FileList | null) {
-    if (!files || files.length === 0) return;
-    const picked = Array.from(files).filter((f) => /^image\//i.test(f.type));
-    if (picked.length === 0) return;
-    setPending((prev) => ({ ...prev, [gkey]: [...(prev[gkey] ?? []), ...picked] }));
-  }
-
   /** Delete a colour group; its unsaved images fall back to the general area. */
   function removeColorGroup(i: number) {
     const gkey = colorsRef.current[i]?.gkey;
@@ -1379,18 +1323,11 @@ function EditProductDialog({
 
   }
 
-  /** Move one unsaved image between groups ("" = general, or a new group). */
+  /** Move one unsaved image between the general area and a named colour. */
   function moveFile(fromKey: string, index: number, toKey: string) {
     const file = (pendingRef.current[fromKey] ?? [])[index];
     if (!file) return;
-    let target = toKey;
-    if (toKey === "__new") {
-      target = nextGroupKey();
-      setColors((rows) => [...rows, {
-        gkey: target, label: "", hex: null,
-        size: nextCycleSize(rows.length), quantity: "",
-      }]);
-    }
+    const target = toKey;
     if (target === fromKey) return;
     setPending((prev) => ({
       ...prev,
@@ -1412,16 +1349,15 @@ function EditProductDialog({
   function GroupPicker({ fromKey, index }: { fromKey: string; index: number }) {
     return (
       <select
-        aria-label="نقل الصورة إلى مجموعة"
-        className="mt-1 h-5 w-14 rounded-md border border-border/60 bg-background px-0.5 text-[9px]"
-        value={fromKey}
+        aria-label="لون الصورة"
+        className="mt-1 h-7 w-24 rounded-md border border-border/60 bg-background px-1 text-[10px]"
+        value={colors.some((c) => c.gkey === fromKey && c.label.trim()) ? fromKey : ""}
         onChange={(e) => moveFile(fromKey, index, e.target.value)}
       >
-        <option value="">عامة</option>
-        {colors.map((c, ci) => (
-          <option key={c.gkey} value={c.gkey}>{c.label.trim() || `لون ${ci + 1}`}</option>
+        <option value="">اختر اللون</option>
+        {Array.from(new Map(colors.filter((c) => c.label.trim()).map((c) => [colorKey(c.label), c] as const)).values()).map((c) => (
+          <option key={c.gkey} value={c.gkey}>{c.label.trim()}</option>
         ))}
-        <option value="__new">+ جديدة</option>
       </select>
     );
   }
@@ -1435,8 +1371,8 @@ function EditProductDialog({
         onChange={(e) => setSavedAssign((prev) => ({ ...prev, [imageId]: e.target.value }))}
       >
         <option value="">بدون لون</option>
-        {Array.from(new Map(colors.map((c) => [c.gkey, c] as const)).values()).map((c, ci) => (
-          <option key={c.gkey} value={c.gkey}>{c.label.trim() || `لون ${ci + 1}`}</option>
+        {Array.from(new Map(colors.filter((c) => c.label.trim()).map((c) => [colorKey(c.label), c] as const)).values()).map((c) => (
+          <option key={c.gkey} value={c.gkey}>{c.label.trim()}</option>
         ))}
       </select>
     );
@@ -1467,7 +1403,9 @@ function EditProductDialog({
               ارفع الصور، ثم اختر لون كل صورة من القائمة أسفلها.
             </p>
             <div className="flex flex-wrap gap-2">
-              {imagesFor(undefined).map((img) => (
+              {product.images.map((img) => {
+                const linkedColor = colors.find((c) => c.id === img.color_id);
+                return (
                 <div key={img.id} className="relative">
                   <img src={img.url} alt="" className="h-14 w-14 rounded-lg border border-border/60 object-cover" />
                   <button type="button" aria-label="حذف الصورة"
@@ -1475,22 +1413,22 @@ function EditProductDialog({
                     className="absolute -left-1 -top-1 grid h-4 w-4 place-items-center rounded-full bg-destructive text-destructive-foreground">
                     <X className="h-2.5 w-2.5" />
                   </button>
-                  <SavedImageColorPicker imageId={img.id} />
+                  <SavedImageColorPicker imageId={img.id} value={linkedColor?.gkey ?? ""} />
                 </div>
-              ))}
-              {(pending[""] ?? []).map((f, k) => { return (
+                );
+              })}
+              {Object.entries(pending).flatMap(([fromKey, files]) => files.map((f, k) => (
                   <div key={`pg-${k}`} className="relative">
                     <img src={URL.createObjectURL(f)} alt={f.name}
                       className="h-14 w-14 rounded-lg border border-dashed border-primary/50 object-cover" />
                     <button type="button" aria-label="إزالة"
-                      onClick={() => setPending((prev) => ({ ...prev, "": (prev[""] ?? []).filter((_, j) => j !== k) }))}
+                      onClick={() => setPending((prev) => ({ ...prev, [fromKey]: (prev[fromKey] ?? []).filter((_, j) => j !== k) }))}
                       className="absolute -left-1 -top-1 grid h-4 w-4 place-items-center rounded-full bg-destructive text-destructive-foreground">
                       <X className="h-2.5 w-2.5" />
                     </button>
-                    <GroupPicker fromKey="" index={k} />
+                    <GroupPicker fromKey={fromKey} index={k} />
                   </div>
-                );
-              })}
+              )))}
             </div>
           </div>
 
@@ -1542,11 +1480,6 @@ function EditProductDialog({
                     value={c.size} placeholder="المقاس" className="max-w-[100px]"
                     onChange={(e) => setColors((rows) => rows.map((r, j) => j === i ? { ...r, size: e.target.value } : r))}
                   />
-                  <label className="inline-flex cursor-pointer items-center gap-1 rounded-md border border-border/60 bg-background px-2 py-1 text-[11px] hover:border-primary/40 hover:text-primary">
-                    <ImagePlus className="h-3.5 w-3.5" /> صور
-                    <input type="file" accept="image/*" multiple className="hidden"
-                      onChange={(e) => { addFiles(c.gkey, e.target.files); e.currentTarget.value = ""; }} />
-                  </label>
                   <Input
                     type="number" min={0} required placeholder="الكمية *" className="max-w-[110px]"
                     value={c.quantity}
@@ -1558,39 +1491,6 @@ function EditProductDialog({
                     <Trash2 className="h-4 w-4" />
                   </Button>
                 </div>
-
-
-                {isFirstRowOfColor(i) && (
-                <div className="flex flex-wrap gap-2">
-                  {imagesForGroup(c.id, c.gkey).map((img) => (
-                    <div key={img.id} className="relative">
-                      <img src={img.url} alt={c.label}
-                        className="h-14 w-14 rounded-lg border border-border/60 object-cover" />
-                      <button type="button" aria-label="حذف الصورة"
-                        onClick={() => delImg.mutate(img.id)}
-                        className="absolute -left-1 -top-1 grid h-4 w-4 place-items-center rounded-full bg-destructive text-destructive-foreground">
-                        <X className="h-2.5 w-2.5" />
-                      </button>
-                      <SavedImageColorPicker imageId={img.id} value={c.gkey} />
-                    </div>
-                  ))}
-                  {(pending[c.gkey] ?? []).map((f, k) => (
-                    <div key={`p-${k}`} className="relative">
-                      <img src={URL.createObjectURL(f)} alt={f.name}
-                        className="h-14 w-14 rounded-lg border border-dashed border-primary/50 object-cover" />
-                      <button type="button" aria-label="إزالة"
-                        onClick={() => setPending((prev) => ({
-                          ...prev,
-                          [c.gkey]: (prev[c.gkey] ?? []).filter((_, j) => j !== k),
-                        }))}
-                        className="absolute -left-1 -top-1 grid h-4 w-4 place-items-center rounded-full bg-destructive text-destructive-foreground">
-                        <X className="h-2.5 w-2.5" />
-                      </button>
-                      <GroupPicker fromKey={c.gkey} index={k} />
-                    </div>
-                  ))}
-                </div>
-                )}
               </div>
             ))}
           </div>

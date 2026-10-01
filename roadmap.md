@@ -13,3 +13,4 @@
 - [x] Add the complete customer chat to the brand owner's website preview, connected to the same agent
 - [x] Browser/device push notifications (Firebase Cloud Messaging) for new orders, missing info, and human handoff
 - [x] Remove product-image analysis and simplify image upload with manual colour assignment
+- [x] Unify product image uploads and remove confusing unnamed colour/image groups
