@@ -8,3 +8,5 @@
 > Commits you push to the connected branch sync back to Lovable and show up in
 > the editor, so keep the branch in a working state.
 <!-- LOVABLE:END -->
+
+- Product image uploads are manual-only: never auto-analyze images or auto-fill product fields, because merchants assign colours themselves.
