@@ -791,11 +791,6 @@ function AddProductDialog({
     });
   }
 
-  /** Images of a colour are shown once, on the first row of its group. */
-  function isFirstRowOfGroup(i: number) {
-    return colors.findIndex((r) => r.gkey === colors[i]!.gkey) === i;
-  }
-
   /** Remove a row; if it was the last row of its group, its images go back to intake. */
   function removeColor(i: number) {
     const gone = colorsRef.current[i];
