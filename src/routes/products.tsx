@@ -978,14 +978,34 @@ function AddProductDialog({
           <section className="space-y-3 rounded-xl border border-primary/30 bg-primary/5 p-4">
             <div className="flex items-center justify-between gap-2">
               <h4 className="text-xs font-semibold text-primary">١. صور المنتج</h4>
-              <label className="inline-flex cursor-pointer items-center gap-1 rounded-md border border-border/60 bg-background px-2 py-1 text-[11px] transition hover:border-primary/40 hover:text-primary">
-                <ImagePlus className="h-3.5 w-3.5" /> رفع صور
-                <input
-                  type="file" accept="image/*" multiple className="hidden"
-                  onChange={(e) => { addIntakeFiles(e.target.files); e.currentTarget.value = ""; }}
-                />
-              </label>
+              {(pendingImages["g"]?.length ?? 0) > 0 && (
+                <span className="rounded-full bg-primary/10 px-2 py-0.5 text-[10px] font-medium text-primary">
+                  {pendingImages["g"]!.length} صورة
+                </span>
+              )}
             </div>
+            {/* Large drop zone: click to pick, or drag & drop many images at once. */}
+            <label
+              className="flex cursor-pointer flex-col items-center justify-center gap-2 rounded-xl border-2 border-dashed border-primary/40 bg-background/60 px-4 py-6 text-center transition hover:border-primary hover:bg-primary/10 data-[dragging=true]:border-primary data-[dragging=true]:bg-primary/10"
+              data-dragging={dragOver || undefined}
+              onDragOver={(e) => { e.preventDefault(); setDragOver(true); }}
+              onDragLeave={() => setDragOver(false)}
+              onDrop={(e) => {
+                e.preventDefault();
+                setDragOver(false);
+                addIntakeFiles(e.dataTransfer.files);
+              }}
+            >
+              <ImagePlus className="h-8 w-8 text-primary" />
+              <span className="text-sm font-medium">اضغط هنا لرفع الصور أو اسحبها وأفلتها</span>
+              <span className="text-[11px] text-muted-foreground">
+                يمكنك اختيار عدة صور دفعة واحدة
+              </span>
+              <input
+                type="file" accept="image/*" multiple className="hidden"
+                onChange={(e) => { addIntakeFiles(e.target.files); e.currentTarget.value = ""; }}
+              />
+            </label>
             <p className="text-[10px] text-muted-foreground">
               بعد الرفع، اختر لون كل صورة من القائمة أسفلها أو أضف لونًا جديدًا.
             </p>
