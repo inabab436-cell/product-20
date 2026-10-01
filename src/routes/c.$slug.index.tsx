@@ -165,6 +165,13 @@ function BrandPageInner({ slug }: { slug: string }) {
           </Link>
           <div className="flex items-center justify-end gap-1">
             <Link
+              to="/c/$slug/track" params={{ slug }}
+              aria-label="تتبع طلبك"
+              className="grid h-10 w-10 place-items-center hover:bg-muted"
+            >
+              <Search className="h-5 w-5" strokeWidth={1.5} />
+            </Link>
+            <Link
               to="/c/$slug/account" params={{ slug }}
               aria-label={session.data?.loggedIn ? "حسابي" : "تسجيل الدخول"}
               className="grid h-10 w-10 place-items-center hover:bg-muted"
