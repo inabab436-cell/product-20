@@ -1103,14 +1103,21 @@ function AddProductDialog({
 
                 <div className="flex items-center justify-between gap-2">
                   <span className="text-[10px] text-muted-foreground">صور هذا اللون</span>
-                  <label className="inline-flex cursor-pointer items-center gap-1 rounded-md border border-border/60 bg-background px-2 py-1 text-[11px] transition hover:border-primary/40 hover:text-primary">
-                    <ImagePlus className="h-3.5 w-3.5" /> رفع صور
-                    <input
-                      type="file" accept="image/*" multiple className="hidden"
-                      onChange={(e) => { addFiles(c.gkey, e.target.files); e.currentTarget.value = ""; }}
-                    />
-                  </label>
                 </div>
+                <label
+                  className="flex cursor-pointer items-center justify-center gap-2 rounded-lg border border-dashed border-border/70 bg-background/60 px-3 py-2.5 text-[11px] text-muted-foreground transition hover:border-primary/50 hover:text-primary"
+                  onDragOver={(e) => e.preventDefault()}
+                  onDrop={(e) => {
+                    e.preventDefault();
+                    addFiles(c.gkey, e.dataTransfer.files);
+                  }}
+                >
+                  <ImagePlus className="h-4 w-4" /> رفع صور هذا اللون أو إفلاتها هنا
+                  <input
+                    type="file" accept="image/*" multiple className="hidden"
+                    onChange={(e) => { addFiles(c.gkey, e.target.files); e.currentTarget.value = ""; }}
+                  />
+                </label>
                 {/* Images of a colour are shown ONCE, on the first row of its group. */}
                 {isFirstRowOfGroup(i) && <Thumbs imgKey={c.gkey} />}
               </div>
