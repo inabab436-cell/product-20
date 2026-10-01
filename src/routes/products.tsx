@@ -732,6 +732,7 @@ function AddProductDialog({
   const [colors, setColors] = useState<AddColor[]>([]);
   // Images picked before the product exists, keyed by colour group key ("g" = intake).
   const [pendingImages, setPendingImages] = useState<Record<string, File[]>>({});
+  const [dragOver, setDragOver] = useState(false);
 
   // Always-fresh view of `colors` for use after awaits.
   const colorsRef = useRef<AddColor[]>(colors);
