@@ -33,6 +33,7 @@ import { Route as SettingsPaymentMethodsRouteImport } from './routes/settings.pa
 import { Route as TeamJoinRouteImport } from './routes/team.join'
 import { Route as CSlugIndexRouteImport } from './routes/c.$slug.index'
 import { Route as CSlugAccountRouteImport } from './routes/c.$slug.account'
+import { Route as CSlugTrackRouteImport } from './routes/c.$slug.track'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -154,6 +155,11 @@ const CSlugAccountRoute = CSlugAccountRouteImport.update({
   path: '/account',
   getParentRoute: () => CSlugRoute,
 } as any)
+const CSlugTrackRoute = CSlugTrackRouteImport.update({
+  id: '/track',
+  path: '/track',
+  getParentRoute: () => CSlugRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -179,6 +185,7 @@ export interface FileRoutesByFullPath {
   '/settings/payment-methods': typeof SettingsPaymentMethodsRoute
   '/team/join': typeof TeamJoinRoute
   '/c/$slug/account': typeof CSlugAccountRoute
+  '/c/$slug/track': typeof CSlugTrackRoute
   '/c/$slug/': typeof CSlugIndexRoute
 }
 export interface FileRoutesByTo {
@@ -204,6 +211,7 @@ export interface FileRoutesByTo {
   '/settings/payment-methods': typeof SettingsPaymentMethodsRoute
   '/team/join': typeof TeamJoinRoute
   '/c/$slug/account': typeof CSlugAccountRoute
+  '/c/$slug/track': typeof CSlugTrackRoute
   '/c/$slug': typeof CSlugIndexRoute
 }
 export interface FileRoutesById {
@@ -231,6 +239,7 @@ export interface FileRoutesById {
   '/settings/payment-methods': typeof SettingsPaymentMethodsRoute
   '/team/join': typeof TeamJoinRoute
   '/c/$slug/account': typeof CSlugAccountRoute
+  '/c/$slug/track': typeof CSlugTrackRoute
   '/c/$slug/': typeof CSlugIndexRoute
 }
 export interface FileRouteTypes {
@@ -259,6 +268,7 @@ export interface FileRouteTypes {
     | '/settings/payment-methods'
     | '/team/join'
     | '/c/$slug/account'
+    | '/c/$slug/track'
     | '/c/$slug/'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -284,6 +294,7 @@ export interface FileRouteTypes {
     | '/settings/payment-methods'
     | '/team/join'
     | '/c/$slug/account'
+    | '/c/$slug/track'
     | '/c/$slug'
   id:
     | '__root__'
@@ -310,6 +321,7 @@ export interface FileRouteTypes {
     | '/settings/payment-methods'
     | '/team/join'
     | '/c/$slug/account'
+    | '/c/$slug/track'
     | '/c/$slug/'
   fileRoutesById: FileRoutesById
 }
@@ -507,6 +519,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CSlugAccountRouteImport
       parentRoute: typeof CSlugRoute
     }
+    '/c/$slug/track': {
+      id: '/c/$slug/track'
+      path: '/track'
+      fullPath: '/c/$slug/track'
+      preLoaderRoute: typeof CSlugTrackRouteImport
+      parentRoute: typeof CSlugRoute
+    }
   }
 }
 
@@ -522,11 +541,13 @@ const TeamRouteWithChildren = TeamRoute._addFileChildren(TeamRouteChildren)
 
 interface CSlugRouteChildren {
   CSlugAccountRoute: typeof CSlugAccountRoute
+  CSlugTrackRoute: typeof CSlugTrackRoute
   CSlugIndexRoute: typeof CSlugIndexRoute
 }
 
 const CSlugRouteChildren: CSlugRouteChildren = {
   CSlugAccountRoute: CSlugAccountRoute,
+  CSlugTrackRoute: CSlugTrackRoute,
   CSlugIndexRoute: CSlugIndexRoute,
 }
 

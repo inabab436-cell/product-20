@@ -3,7 +3,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
-import { ShoppingBag, ShoppingCart, X, Send, Info, Truck, PhoneCall, ScrollText, MessageSquare, UserCircle2, Flame, Tag, ShieldCheck } from "lucide-react";
+import { ShoppingBag, ShoppingCart, X, Send, Info, Truck, PhoneCall, ScrollText, MessageSquare, UserCircle2, Flame, Tag, ShieldCheck, Search } from "lucide-react";
 import { bestOfferPlan, type OfferPlan } from "@/lib/product-offer-badge";
 import {
   validateAddress,
@@ -164,6 +164,13 @@ function BrandPageInner({ slug }: { slug: string }) {
             <span className="store-display truncate text-3xl sm:text-4xl">{brandName}</span>
           </Link>
           <div className="flex items-center justify-end gap-1">
+            <Link
+              to="/c/$slug/track" params={{ slug }}
+              aria-label="تتبع طلبك"
+              className="grid h-10 w-10 place-items-center hover:bg-muted"
+            >
+              <Search className="h-5 w-5" strokeWidth={1.5} />
+            </Link>
             <Link
               to="/c/$slug/account" params={{ slug }}
               aria-label={session.data?.loggedIn ? "حسابي" : "تسجيل الدخول"}
