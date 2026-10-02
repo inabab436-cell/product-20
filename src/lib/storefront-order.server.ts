@@ -23,13 +23,11 @@ export interface OrderTotals {
   currency: string | null;
 }
 
-/** Same format the chat agent uses: ORD-YYYYMMDD-#####. */
-export function newOrderNumber(now: Date = new Date()): string {
-  const yyyy = now.getUTCFullYear().toString();
-  const mm = (now.getUTCMonth() + 1).toString().padStart(2, "0");
-  const dd = now.getUTCDate().toString().padStart(2, "0");
-  const rand = Math.floor(Math.random() * 100000).toString().padStart(5, "0");
-  return `ORD-${yyyy}${mm}${dd}-${rand}`;
+/** 8-digit numeric order number, shared by the storefront and the chat agent. */
+export function newOrderNumber(_now: Date = new Date()): string {
+  let n = "";
+  for (let i = 0; i < 8; i++) n += Math.floor(Math.random() * 10);
+  return n;
 }
 
 function round2(n: number): number {

@@ -2828,12 +2828,9 @@ export const Route = createFileRoute("/api/chat-ai")({
 
 
           function newOrderNumber(): string {
-            const now = new Date();
-            const yyyy = now.getUTCFullYear().toString();
-            const mm = (now.getUTCMonth() + 1).toString().padStart(2, "0");
-            const dd = now.getUTCDate().toString().padStart(2, "0");
-            const rand = Math.floor(Math.random() * 100000).toString().padStart(5, "0");
-            return `ORD-${yyyy}${mm}${dd}-${rand}`;
+            let n = "";
+            for (let i = 0; i < 8; i++) n += Math.floor(Math.random() * 10);
+            return n;
           }
 
           async function executeCreateOrder(

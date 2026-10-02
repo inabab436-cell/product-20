@@ -8,9 +8,9 @@ import {
 } from "@/lib/storefront-order.server";
 
 describe("newOrderNumber", () => {
-  it("matches the chat agent format ORD-YYYYMMDD-#####", () => {
+  it("is an 8-digit numeric code with no letters", () => {
     const n = newOrderNumber(new Date(Date.UTC(2026, 7, 2)));
-    expect(n).toMatch(/^ORD-20260802-\d{5}$/);
+    expect(n).toMatch(/^\d{8}$/);
   });
 });
 
