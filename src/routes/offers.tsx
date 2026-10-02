@@ -5,7 +5,6 @@ import {
   BadgePercent,
   Clock,
   Hourglass,
-  Info,
   Loader2,
   Plus,
   Repeat,
@@ -387,7 +386,7 @@ function OffersPage() {
   return (
     <PageShell
       title="العروض والخصومات"
-      description="عرض خاص بمنتج واحد أو عرض شامل لكل المنتجات، مرتبط بمدة زمنية حقيقية أو بعدد مستفيدين — وينتهي تلقائياً بأول شرط يتحقق."
+      description="أنشئ عرضاً بخصم على منتج محدد أو على كل المنتجات."
       icon={<BadgePercent className="h-5 w-5" />}
       actions={
         <Button
@@ -401,17 +400,6 @@ function OffersPage() {
         </Button>
       }
     >
-      <div className="mb-4 flex items-start gap-3 rounded-lg border border-primary/20 bg-primary/5 p-4 text-sm leading-relaxed">
-        <Info className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
-        <p className="text-muted-foreground">
-          <span className="font-medium text-foreground">كيف يُحسب الحد الأدنى؟</span>{" "}
-          في العرض الخاص بمنتج واحد، الحد الأدنى شرط على قيمة هذا المنتج وحده — أسعار المنتجات
-          الأخرى لا تُضاف إليه، والخصم لا يُطبَّق عليها. مثال: خصم 60% على فستان بحد أدنى 1000
-          جنيه لا ينطبق على فستان بـ120 جنيه، ولا ينطبق حتى لو أضاف العميل سويت شيرت بـ850 جنيه.
-          أما العرض الشامل لكل المنتجات فالحد الأدنى فيه محسوب على إجمالي الطلب. الوكيل لا يجتهد
-          في ذلك: محرّك العروض هو الذي يحسب الأهلية والخصم، والوكيل يبلّغ العميل بالنتيجة كما هي.
-        </p>
-      </div>
 
       {open && (
         <section className="space-y-4 rounded-2xl border border-border/60 bg-background/80 p-4 shadow-card backdrop-blur">
@@ -499,6 +487,13 @@ function OffersPage() {
               value={String(form.ends_at ?? "")}
               onChange={(v) => setForm({ ...form, ends_at: v })}
             />
+          </div>
+
+          <details className="rounded-xl border border-border/60 p-3">
+            <summary className="cursor-pointer text-sm font-semibold">
+              خيارات إضافية (اختياري)
+            </summary>
+            <div className="mt-3 grid gap-4 sm:grid-cols-2">
 
             <div className="space-y-1.5">
               <Label>عدد المستفيدين من العرض (اختياري)</Label>
@@ -581,9 +576,7 @@ function OffersPage() {
               />
               
             </div>
-          </div>
-
-          <div className="space-y-3 rounded-xl border border-border/60 p-3">
+            <div className="space-y-3 rounded-xl border border-border/60 p-3 sm:col-span-2">
             <div>
               <div className="text-sm font-semibold">المعلومات اللي تظهر جنب الخصم للعميل</div>
               <div className="text-xs text-muted-foreground">
@@ -616,7 +609,7 @@ function OffersPage() {
             </div>
           </div>
 
-          <div className="space-y-3 rounded-xl border border-border/60 p-3">
+            <div className="space-y-3 rounded-xl border border-border/60 p-3 sm:col-span-2">
             <div className="flex items-center justify-between gap-4">
               <div>
                 <div className="text-sm font-semibold">إرسال رسالة تلقائية لكل العملاء</div>
@@ -654,6 +647,8 @@ function OffersPage() {
               </div>
             )}
           </div>
+          </div>
+          </details>
 
           <div className="flex items-center justify-between gap-4">
             <div className="flex items-center gap-2">
