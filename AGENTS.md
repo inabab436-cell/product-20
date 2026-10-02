@@ -10,3 +10,4 @@
 <!-- LOVABLE:END -->
 
 - Product image uploads are manual-only: never auto-analyze images or auto-fill product fields, because merchants assign colours themselves.
+- Keep dashboard-specific visual tokens scoped under `.hub-dashboard` so the wider merchant hub retains its existing theme.

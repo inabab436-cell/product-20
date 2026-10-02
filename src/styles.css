@@ -67,6 +67,14 @@
   --color-hub-mint-soft: var(--hub-mint-soft);
   --color-hub-sky: var(--hub-sky);
   --color-hub-sky-soft: var(--hub-sky-soft);
+  --color-dashboard-blue: var(--dashboard-blue);
+  --color-dashboard-blue-soft: var(--dashboard-blue-soft);
+  --color-dashboard-green: var(--dashboard-green);
+  --color-dashboard-green-soft: var(--dashboard-green-soft);
+  --color-dashboard-amber: var(--dashboard-amber);
+  --color-dashboard-amber-soft: var(--dashboard-amber-soft);
+  --color-dashboard-rose: var(--dashboard-rose);
+  --color-dashboard-rose-soft: var(--dashboard-rose-soft);
 }
 
 :root {
@@ -379,6 +387,68 @@
 
 .hub-scroll-x::-webkit-scrollbar {
   display: none;
+}
+
+/* Dashboard-only palette: Cloud White with restrained functional accents. */
+.hub-dashboard {
+  --hub-canvas: oklch(0.985 0.004 247);
+  --hub-paper: oklch(1 0 0);
+  --hub-ink: oklch(0.25 0.026 256);
+  --background: var(--hub-canvas);
+  --foreground: var(--hub-ink);
+  --card: var(--hub-paper);
+  --card-foreground: var(--hub-ink);
+  --primary: oklch(0.623 0.188 260);
+  --primary-foreground: oklch(1 0 0);
+  --muted: oklch(0.955 0.009 248);
+  --muted-foreground: oklch(0.555 0.031 258);
+  --border: oklch(0.925 0.009 253);
+  --dashboard-blue: oklch(0.623 0.188 260);
+  --dashboard-blue-soft: oklch(0.965 0.022 254);
+  --dashboard-green: oklch(0.59 0.14 156);
+  --dashboard-green-soft: oklch(0.963 0.025 156);
+  --dashboard-amber: oklch(0.68 0.14 73);
+  --dashboard-amber-soft: oklch(0.969 0.032 80);
+  --dashboard-rose: oklch(0.62 0.17 22);
+  --dashboard-rose-soft: oklch(0.965 0.028 20);
+  --shadow-card: 0 1px 2px oklch(0.25 0.026 256 / 0.04), 0 10px 24px -20px oklch(0.25 0.026 256 / 0.22);
+  font-family: "Manrope", "Cairo", sans-serif;
+}
+
+.hub-dashboard h1,
+.hub-dashboard h2,
+.hub-dashboard h3,
+.hub-dashboard .dashboard-number {
+  font-family: "Sora", "Cairo", sans-serif;
+  letter-spacing: 0;
+}
+
+@utility dashboard-summary-card {
+  display: flex;
+  min-height: 7rem;
+  align-items: center;
+  gap: 1rem;
+  border-radius: 0.5rem;
+  border: 1px solid var(--border);
+  background-color: var(--card);
+  padding: 1rem;
+  box-shadow: var(--shadow-card);
+  transition: border-color 160ms ease, transform 160ms ease;
+}
+
+.dashboard-summary-card:hover {
+  border-color: color-mix(in oklab, var(--primary) 30%, var(--border));
+  transform: translateY(-1px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hub-dashboard *,
+  .hub-dashboard *::before,
+  .hub-dashboard *::after {
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+  }
 }
 
 /* CUPAI early-access page — light, calm extension of the main brand. */

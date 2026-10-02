@@ -16,3 +16,4 @@
 - [x] Browser/device push notifications (Firebase Cloud Messaging) for new orders, missing info, and human handoff
 - [x] Remove product-image analysis and simplify image upload with manual colour assignment
 - [x] Unify product image uploads and remove confusing unnamed colour/image groups
+- [x] Redesign the merchant dashboard with a clean responsive sidebar and organized quick access
