@@ -14,9 +14,7 @@ export interface AppSessionData {
   userId: string;
   email: string;
   /** Present only when a staff member is signed in (not the owner). */
-  staffId?: string;
   /** The signed-in person's own email (staff email, or the owner's). */
-  actorEmail?: string;
 }
 
 export function getSessionConfig() {
