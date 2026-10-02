@@ -16,6 +16,8 @@ import {
   listNotifications, markNotificationRead, type NotificationRow, type NotificationType,
 } from "@/lib/notifications.functions";
 import { getEarningsSummary } from "@/lib/orders.functions";
+import { getCurrentActor } from "@/lib/staff.functions";
+import { hasPermission, type StaffPermission } from "@/lib/staff-types";
 
 
 
@@ -41,7 +43,7 @@ type Tile = {
   icon: React.ReactNode;
   tone: string;
   /** Permission required to open this tile. */
-  perm: string;
+  perm: StaffPermission;
 };
 
 const TILES: Tile[] = [
@@ -60,9 +62,14 @@ function formatMoney(value: number) {
 }
 
 function DashboardPage() {
-  const actor = { isOwner: true };
-  const can = (_perm: string) => true;
-  const isOwner = true;
+  const actorQuery = useQuery({
+    queryKey: ["current-actor"],
+    queryFn: () => getCurrentActor(),
+    staleTime: 60_000,
+  });
+  const actor = actorQuery.data ?? null;
+  const can = (perm: StaffPermission) => (actor ? hasPermission(actor, perm) : false);
+  const isOwner = actor?.isOwner ?? false;
 
   const notifs = useQuery({
     queryKey: ["notifications"],
@@ -197,6 +204,11 @@ function DashboardPage() {
                   </Link>
                 )}
                 {isOwner && (
+                  <Link to="/team" className="flex items-center gap-3 p-4 transition-colors hover:bg-muted/60">
+                    <span className="grid h-9 w-9 place-items-center rounded-lg bg-muted text-foreground"><Users className="h-[18px] w-[18px]" /></span>
+                    <span className="min-w-0 flex-1 text-sm font-semibold">الفريق والصلاحيات</span>
+                    <ArrowLeft className="h-4 w-4 text-muted-foreground" />
+                  </Link>
                 )}
               </div>
             </section>
